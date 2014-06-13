@@ -1,0 +1,18 @@
+<body>
+ {{> scada}}
+</body>
+
+<template name='scada'>
+ {{> yesNo name='balbula_1'}}
+ {{> yesNo name='balbula_2'}}
+</template>
+
+<template name='yesNo'>
+    {{#with dataValue this.name}}
+        <div class=swidget name={{this.name}} >
+            <svg height=10 width=10>
+                <circle cx=5 cy=5 r=5 fill={{getColor this.name}} />
+            </svg>
+        </div>
+    {{/with}}
+</template>
