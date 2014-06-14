@@ -1,16 +1,21 @@
-fs = Npm.require('fs')
-
 sourceData = @sourceData
 
+g = (variable)->
+    item = sourceData.findOne(name:variable)
+    if item
+        not item.value
+        
+
 Meteor.methods
-    Control: (name, value)->
-        item = sourceData.findOne(name:name)
-        if item
-            value = value or not item.value
-            sourceData.update({name:name}, {$set: {value:value} })
+    Control: (variable) ->
+        value = if g variable then 1 else 0
+        HTTP.call 'GET', 'http://localhost:5000/set_balbula_1/'+value
+        
 
 f = ->
-    fs.readFile '/home/miguel/data.data', {encoding: 'utf-8'}, Meteor.bindEnvironment (err, data)->
-        console.log 'data:', data
-        Meteor.call 'Control', 'balbula_1', if data == 'true' then true else false
+    data = HTTP.call 'GET', 'http://localhost:5000/data'
+    data = data.data
+    for key, value of data
+        sourceData.update({name: key}, {$set: {value: value } })
+
 Meteor.setInterval f, 1000
