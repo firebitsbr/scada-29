@@ -10,7 +10,7 @@ UI.registerHelper 'dataValue', (variable)->
     else
         null
 
-Template.yesNo.helpers
+Template.swYesNo.helpers
     getColor: (variable)->
         item = sourceData.findOne(name:variable)
         if item
@@ -18,9 +18,9 @@ Template.yesNo.helpers
         else
             'black'
 
-Template.yesNo.events
+Template.swYesNo.events
     'click circle': (e,t)->
-        Meteor.call 'Control', $(e.target).attr('variable')#$(t.find('div')).attr('name')
+        Meteor.call 'Control', $(e.target).attr('variable')
         
 
 Template.swBasicPerecentage.helpers
@@ -36,9 +36,16 @@ Template.swBasicPerecentage.helpers
         this.width/2
 
 Template.swVelocimeter.helpers
+    getColor: ->
+        if this.value <= 50
+            '#82FA58'
+        else
+            'pink'
     x2 : (value)-> 
         alfa = value*2*Math.PI/100.0
         25+25.0*Math.cos(alfa)
     y2 : (value)-> 
         alfa = value*2*Math.PI/100.0
         25+25.0*Math.sin(alfa)
+    getAlfa: ->
+        alfa = this.value*360/100.0
