@@ -1,4 +1,9 @@
 sourceData = @sourceData
+sourceDataHist = @sourceDataHist
+
+Meteor.subscribe 'sourceData'
+Meteor.subscribe 'sourceDataHist'
+
 
 UI.registerHelper 'dataValue', (variable)->
     item = sourceData.findOne(name:variable)
@@ -49,3 +54,33 @@ Template.swVelocimeter.helpers
         25+25.0*Math.sin(alfa)
     getAlfa: ->
         alfa = this.value*360/100.0
+
+
+Template.grafica.rendered = ->
+    height = 500
+    width = 500
+    d3.select("#grafica").attr("width", width).attr("height", height).append("path").attr("class", "line")
+
+Template.grafica.ayuda = ->
+    data = sourceDataHist.find().fetch()
+    
+    height = 500
+    width = 500
+    x = d3.scale.linear().range([0, width])
+    y = d3.scale.linear().range([height, 0])
+    
+    valueline = d3.svg.line()
+    .x((d)->x(d.time))
+    .y((d)->y(d.value))
+    
+    x.domain(d3.extent(data, (d)-> d.time))
+    y.domain([0, d3.max(data, (d)-> d.value)])
+
+    path = d3.select("#grafica").select('path')
+    #.append("g")
+    #.attr("transform", "translate(" + '0' + "," + '0' + ")")
+
+    path.attr("d", valueline(data))
+
+
+    null
