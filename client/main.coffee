@@ -60,9 +60,16 @@ Template.grafica.rendered = ->
     height = 500
     width = 500
     d3.select("#grafica").attr("width", width).attr("height", height).append("path").attr("class", "line")
+    d3.select("#grafica").append("path").attr("class", "rule")
 
 Template.grafica.ayuda = ->
-    data = sourceDataHist.find().fetch()
+    data = sourceDataHist.find({}, {sort:{time:1} }).fetch()
+
+    suma = 0
+    for d, i in data
+        suma += d.value
+
+    console.log suma/i
     
     height = 500
     width = 500
@@ -76,11 +83,16 @@ Template.grafica.ayuda = ->
     x.domain(d3.extent(data, (d)-> d.time))
     y.domain([0, d3.max(data, (d)-> d.value)])
 
-    path = d3.select("#grafica").select('path')
+    path = d3.select("#grafica").select('path.line')
     #.append("g")
     #.attr("transform", "translate(" + '0' + "," + '0' + ")")
-
     path.attr("d", valueline(data))
-
+    path = d3.select("#grafica").select('path.rule')
+    min_max = d3.extent(data, (d)-> d.time)
+    min = min_max[0]
+    max = min_max[1]
+    data = [[min, 50], [max, 50]]
+    valueline = d3.svg.line().x( (d)->x(d[0]) ).y( (d)->y(d[1]) )
+    path.attr("d", valueline(data))
 
     null
