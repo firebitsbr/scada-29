@@ -4,7 +4,7 @@ url = process.env.IP_DA
 
 Meteor.methods
     Control: (variable) ->
-        HTTP.call 'POST', url+'/set', {params: {var: 'balbula_1'}}
+        HTTP.call 'POST', url+'/set', {params: {var: variable}}
         
 
 f = ->

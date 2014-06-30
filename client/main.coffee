@@ -6,13 +6,16 @@ Meteor.subscribe 'sourceDataHist'
 
 
 UI.registerHelper 'dataValue', (variable)->
+
     item = sourceData.findOne(name:variable)
     if item
+
         this.value = item.value
         this._id = item._id
         this.variable = variable
         this
     else
+
         null
 
 Template.swYesNo.helpers
@@ -33,7 +36,7 @@ Template.swBasicPerecentage.helpers
         w = this.width
         w*value/100
     getColor: (value) ->
-        if value >= 50
+        if value > 50
             'red'
         else
             'green'
@@ -61,26 +64,33 @@ Template.grafica.rendered = ->
     width = 500
     d3.select("#grafica").attr("width", width).attr("height", height).append("path").attr("class", "line")
     d3.select("#grafica").append("path").attr("class", "rule")
+    d3.select('#grafica').append('g').attr("class", "xaxis")
 
 Template.grafica.ayuda = ->
     data = sourceDataHist.find({}, {sort:{time:1} }).fetch()
 
+    data_ = []
     suma = 0
     for d, i in data
         suma += d.value
+        data_.push {time: d.time - moment().unix(), value: d.value}
 
-    console.log suma/i
+    data = data_
+
+    #console.log suma/i
     
     height = 500
     width = 500
-    x = d3.scale.linear().range([0, width])
-    y = d3.scale.linear().range([height, 0])
+    margin=20
+    x = d3.scale.linear().range([0 + margin, width-margin])
+    y = d3.scale.linear().range([height-margin, 0+margin])
     
     valueline = d3.svg.line()
     .x((d)->x(d.time))
     .y((d)->y(d.value))
     
-    x.domain(d3.extent(data, (d)-> d.time))
+    #x.domain(d3.extent(data, (d)-> d.time))
+    x.domain([-180, 0])
     y.domain([0, d3.max(data, (d)-> d.value)])
 
     path = d3.select("#grafica").select('path.line')
@@ -88,11 +98,13 @@ Template.grafica.ayuda = ->
     #.attr("transform", "translate(" + '0' + "," + '0' + ")")
     path.attr("d", valueline(data))
     path = d3.select("#grafica").select('path.rule')
-    min_max = d3.extent(data, (d)-> d.time)
-    min = min_max[0]
-    max = min_max[1]
-    data = [[min, 50], [max, 50]]
+    
+    data = [[-180, 50], [0, 50]]
     valueline = d3.svg.line().x( (d)->x(d[0]) ).y( (d)->y(d[1]) )
     path.attr("d", valueline(data))
 
+    xAxis = d3.svg.axis().scale(x)#.ticks(15)
+    d3.select('#grafica').select("g.xaxis").call(xAxis)
+
     null
+
